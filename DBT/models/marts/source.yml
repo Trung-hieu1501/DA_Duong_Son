@@ -1,0 +1,20 @@
+# Định nghĩa source dùng lấy dữ liệu
+
+---
+version: 2
+
+sources:
+  - name: raw_layer             # Tên schema để sử dụng trong các file transform
+    database: hust_2024          # database dùng
+    schema: public              # Schema source dùng để ELT
+    description: Data from application database, brought in by an EL process.   # Mô tả nguồn dữ liệu
+    tables:                     # Liệt kê các bảng cần dùng
+      - name: ratios  # Tên bảng dùng trong transform
+        description: Dữ liệu về chỉ số công ty    # Mô tả bảng (có thể ko dùng)
+        identifier: financial_ratios              # Tên bảng thực tế trong DB
+        columns:                # Các cột sử dụng để test (not null, unique, ...) (có thể ko dùng)
+          - name: symbol        # Tên cột cần kiểm tra
+            tests: [not_null]   # Điều kiện đặt ra phải áp dụng
+
+        
+

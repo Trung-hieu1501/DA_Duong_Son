@@ -1,0 +1,10 @@
+# Các bảng trả về sau khi transform (Có thể ko dùng)
+
+---
+version: 2
+models:
+  - name: financial_ratios__fa    # Bảng trả về 
+    columns:
+      - name: symbol  # cột cần kiểm tra
+        tests:  # Các điều kiện cần kiểm tra 
+          - not_null

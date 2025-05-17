@@ -1,0 +1,17 @@
+---
+tutorial: 
+  target: dev
+  outputs:
+    dev:
+      dbname: hust_2024             # database sử dụng
+      host: localhost    
+      pass: admin123                # pass kết nối db
+      port: 5433                    # port kết nối db
+      schema: mart                  # schema lưu dữ liệu lên báo cáo     
+      threads: 1
+      type: postgres                # Loại database
+      user: hust_2024               # user 
+    
+
+
+
