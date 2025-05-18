@@ -51,7 +51,6 @@ def get_data(**kwargs):
             conn.close()
 
 
-
 def sync_data(**kwargs):
     try:
         data = kwargs['ti'].xcom_pull(task_ids='dag_get_data_postgres', key='financial_data')
@@ -59,44 +58,18 @@ def sync_data(**kwargs):
             logging.warning("Không có dữ liệu từ XCom")
             return
 
+        # Chuyển list dict thành DataFrame
+        df = pd.DataFrame(data)
+
         client = bigquery.Client()
         table_id = "project2-441416.stock_dataa.financial_ratios"
 
-        # Lấy danh sách cột
-        columns = list(data[0].keys())
-        column_names = ', '.join([f"`{col}`" for col in columns])
+        # Dùng load_table_from_dataframe để load dữ liệu lên BigQuery
+        job = client.load_table_from_dataframe(df, table_id)
+        job.result()  # đợi load xong
 
-        # Số dòng mỗi batch (có thể chỉnh sửa batch size)
-        batch_size = 100
+        logging.info("Insert thành công")
 
-        for i in range(0, len(data), batch_size):
-            batch = data[i:i + batch_size]
-
-            rows_to_insert = []
-            for row in batch:
-                values = []
-                for v in row.values():
-                    if v is None:
-                        values.append("NULL")
-                    elif isinstance(v, str):
-                        v_escaped = v.replace("'", "''")
-                        values.append(f"'{v_escaped}'")
-                    else:
-                        values.append(str(v))
-                row_str = f"({', '.join(values)})"
-                rows_to_insert.append(row_str)
-
-            values_clause = ',\n'.join(rows_to_insert)
-            insert_query = f"""
-                INSERT INTO `{table_id}` ({column_names})
-                VALUES
-                {values_clause}
-            """
-            logging.info(insert_query)
-            logging.info(f"Insert batch {i // batch_size + 1}: {len(batch)} dòng")
-            client.query(insert_query).result()
-            logging.info("Insert thành công batch")
-        logging.info("Insert thành công toàn bộ dữ liệu")
     except Exception as e:
         logging.error(f"Lỗi khi xử lý BigQuery: {e}")
         raise
@@ -143,4 +116,5 @@ with DAG(
         python_callable=sync_data,
         op_kwargs={},
     )
+
     wait_for_other_dag >> dag_get_data >> dag_sync_data_bqr
