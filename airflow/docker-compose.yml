@@ -14,8 +14,12 @@ x-airflow-common: &airflow-common
     AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW__WEBSERVER__SECRET_KEY}
     AIRFLOW__WEBSERVER__SESSION_LIFETIME: ${AIRFLOW__WEBSERVER__SESSION_LIFETIME}
     AIRFLOW_UID: ${AIRFLOW_UID}
+
+    # Thêm biến môi trường GOOGLE_APPLICATION_CREDENTIALS cho Google BigQuery
+    GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS}
   volumes:
     - ./dags:/opt/airflow/dags
+    - ./keys:/opt/airflow/keys
   depends_on:
     - postgres
 
